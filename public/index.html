@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Predator Scrabble .io</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="screen-landing" class="screen">
+  <div class="landing-card">
+    <h1>PREDATOR<span class="accent">SCRABBLE</span><span class="io">.io</span></h1>
+
+    <label class="field">
+      <span>Your name</span>
+      <input id="input-name" maxlength="20" />
+    </label>
+
+    <div class="landing-actions">
+      <button id="btn-create-room" class="btn btn-primary">Create Room</button>
+      <div class="or-divider">or</div>
+      <label class="field">
+        <span>Room code</span>
+        <input id="input-room-code" maxlength="4" placeholder="ABCD" style="text-transform:uppercase" />
+      </label>
+      <button id="btn-join-room" class="btn">Join Room</button>
+    </div>
+    <p id="landing-error" class="error-text"></p>
+  </div>
+</div>
+
+<div id="screen-lobby" class="screen hidden">
+  <div class="lobby-card">
+    <h2>Room <span id="lobby-room-code" class="room-code"></span></h2>
+    <p class="tagline">Share this code with the other jungle inhabitants.</p>
+    <ul id="lobby-players" class="lobby-players"></ul>
+    <button id="btn-start-game" class="btn btn-primary">Start Game</button>
+    <p id="lobby-hint" class="hint">Waiting for the host to start&hellip;</p>
+  </div>
+</div>
+
+<div id="screen-game" class="screen hidden">
+  <header class="game-header">
+    <div class="room-badge">Room <b id="header-room-code"></b></div>
+    <div id="phase-banner" class="phase-banner"></div>
+    <div id="turn-banner" class="turn-banner"></div>
+  </header>
+
+  <main class="game-main">
+    <section class="donut-wrap">
+      <div id="donut" class="donut">
+        <div id="jungle" class="jungle"></div>
+      </div>
+      <div class="flip-countdown">
+        <div class="flip-countdown-bar-track"><div id="flip-countdown-bar" class="flip-countdown-bar"></div></div>
+        <div id="flip-countdown-label">Next flip in --s</div>
+      </div>
+      <div id="bag-count" class="bag-count"></div>
+    </section>
+
+    <section id="nests" class="nests-panel">
+      <h3>The Table</h3>
+    </section>
+  </main>
+
+  <section class="control-row">
+    <div class="action-box">
+      <input id="input-word" maxlength="20" placeholder="TYPE A WORD" autocomplete="off" />
+      <button id="btn-play" class="btn btn-primary">Play Word</button>
+      <div class="discharge-row">
+        <button id="btn-rush" type="button" class="btn btn-discharge">&minus; Rush</button>
+        <button id="btn-stall" type="button" class="btn btn-discharge">+ Stall</button>
+      </div>
+      <p class="hint">Auto-detects cuck/fortify, steal, defend, or claim from jungle.</p>
+      <p id="action-error" class="error-text"></p>
+    </div>
+
+    <div class="log-box">
+      <h3>Feed</h3>
+      <ul id="log-list"></ul>
+    </div>
+  </section>
+</div>
+
+<div id="word-history-overlay" class="word-history-overlay hidden">
+  <div class="word-history-panel">
+    <h3>Words Used This Game <span class="hint">(hold TAB)</span></h3>
+    <div id="word-history-list" class="word-history-list"></div>
+  </div>
+</div>
+
+<div id="screen-end" class="screen hidden">
+  <div class="lobby-card">
+    <h2 id="end-title">Meatwatching is over!</h2>
+    <div id="end-results"></div>
+    <button id="btn-play-again" class="btn btn-primary">Back to menu</button>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
