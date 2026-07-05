@@ -48,6 +48,11 @@ on the backend and a plain HTML/CSS/JS client (no build step).
 
 ## Interface
 
+- The game screen always fits the browser window exactly - no page
+  scrolling, on any window size or aspect ratio. The donut is sized in JS
+  to fit whatever room is actually available; only the player list and the
+  feed scroll internally, and only once they genuinely have more content
+  than fits.
 - Every player's nest is always visible as tiles in "The Table" panel next
   to the donut - no need to dig through the feed to see who has what.
 - Actions animate: tiles physically fly from the jungle/donut into a nest,

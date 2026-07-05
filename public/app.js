@@ -392,7 +392,32 @@
     }
   }
 
+  // The donut's CSS size is only an approximate fallback - this measures
+  // whatever room .donut-wrap actually has (which varies with window size,
+  // aspect ratio, and how tall the header/control row end up being) and
+  // sets an exact pixel size so the donut never overflows its column or
+  // forces the page to scroll.
+  function sizeDonut() {
+    const wrap = document.querySelector('.donut-wrap');
+    const donut = document.getElementById('donut');
+    if (!wrap || !donut) return;
+    const countdownEl = document.querySelector('.flip-countdown');
+    const bagCountEl = document.getElementById('bag-count');
+    const wrapRect = wrap.getBoundingClientRect();
+    const reserved = (countdownEl?.offsetHeight || 0) + (bagCountEl?.offsetHeight || 0) + 24;
+    const availableH = wrapRect.height - reserved;
+    const availableW = wrapRect.width;
+    // No large floor here - at extreme window sizes, a donut that refuses to
+    // shrink below some "readable" minimum would overflow its clipped
+    // container and hide the countdown/bag-count text below it. Better to
+    // let the donut get small than to hide other information.
+    const size = Math.max(40, Math.floor(Math.min(availableW, availableH)) - 8);
+    donut.style.width = size + 'px';
+    donut.style.height = size + 'px';
+  }
+
   function renderDonut(state) {
+    sizeDonut();
     const donut = document.getElementById('donut');
     const jungleEl = document.getElementById('jungle');
     donut.querySelectorAll('.donut-tile').forEach((el) => el.remove());
