@@ -36,6 +36,12 @@ class Game {
     this.meatwatchingEndsAt = null;
     this.log = [];
     this.winnerIds = null;
+    this.leastTilesIds = null;
+    this.leastTilesCount = null;
+    this.mostBannedIds = null;
+    this.mostBannedCount = null;
+    this.biggestCuckIds = null;
+    this.biggestCuckCount = null;
     this.eventSeq = 0;
     this.lastEvent = null;
   }
@@ -53,6 +59,8 @@ class Game {
       connected: true,
       banned: false,
       banUntilFlipCount: 0,
+      banCount: 0,
+      tilesStolenFromThem: 0,
       wordIds: [],
       charge: 0,
       chargeUpdatedAt: Date.now(),
@@ -100,6 +108,8 @@ class Game {
       p.wordIds = [];
       p.banned = false;
       p.banUntilFlipCount = 0;
+      p.banCount = 0;
+      p.tilesStolenFromThem = 0;
       p.charge = 0;
       p.chargeUpdatedAt = Date.now();
     }
@@ -192,14 +202,25 @@ class Game {
 
   finishGame() {
     this.phase = 'ended';
+    const players = [...this.players.values()];
+
     let max = -1;
-    for (const p of this.players.values()) {
-      const count = this.tileCountFor(p.id);
-      if (count > max) max = count;
-    }
-    this.winnerIds = [...this.players.values()]
-      .filter((p) => this.tileCountFor(p.id) === max)
-      .map((p) => p.id);
+    for (const p of players) max = Math.max(max, this.tileCountFor(p.id));
+    this.winnerIds = players.filter((p) => this.tileCountFor(p.id) === max).map((p) => p.id);
+
+    let min = Infinity;
+    for (const p of players) min = Math.min(min, this.tileCountFor(p.id));
+    this.leastTilesIds = players.filter((p) => this.tileCountFor(p.id) === min).map((p) => p.id);
+    this.leastTilesCount = min;
+
+    const maxBans = Math.max(0, ...players.map((p) => p.banCount));
+    this.mostBannedIds = maxBans > 0 ? players.filter((p) => p.banCount === maxBans).map((p) => p.id) : [];
+    this.mostBannedCount = maxBans;
+
+    const maxStolen = Math.max(0, ...players.map((p) => p.tilesStolenFromThem));
+    this.biggestCuckIds = maxStolen > 0 ? players.filter((p) => p.tilesStolenFromThem === maxStolen).map((p) => p.id) : [];
+    this.biggestCuckCount = maxStolen;
+
     this.pushLog('Meatwatching is over. Final nests are locked in.');
   }
 
@@ -214,6 +235,7 @@ class Game {
   banPlayer(player, reason) {
     player.banned = true;
     player.banUntilFlipCount = this.flipCount + BAN_FLIP_WINDOW;
+    player.banCount += 1;
     this.pushLog(`${player.name} played an invalid word (${reason}) and is BANNED for 3 flips!`);
     this.emitEvent({ kind: 'ban', playerId: player.id, word: reason });
   }
@@ -359,6 +381,7 @@ class Game {
     player.wordIds.push(wordId);
     entity.ownerId = playerId;
     const oldSpelling = entity.spelling;
+    oldOwner.tilesStolenFromThem += oldSpelling.length;
     entity.spelling = word;
     this.allSpellingsEverUsed.add(word);
     this.pushLog(`${player.name} stole "${word}" from ${oldOwner.name}!`);
@@ -469,6 +492,10 @@ class Game {
       oldOwner.wordIds = oldOwner.wordIds.filter((id) => id !== entity.id);
       player.wordIds.push(entity.id);
       entity.ownerId = playerId;
+      // Only the tiles the victim actually had are "stolen" - the extra
+      // jungle letters that grew the word into something new were never
+      // theirs to lose.
+      oldOwner.tilesStolenFromThem += oldSpelling.length;
     }
     entity.signature = newSignature;
     entity.spelling = word;
@@ -530,6 +557,12 @@ class Game {
       flipCount: this.flipCount,
       meatwatchingEndsAt: this.meatwatchingEndsAt,
       winnerIds: this.winnerIds,
+      leastTilesIds: this.leastTilesIds,
+      leastTilesCount: this.leastTilesCount,
+      mostBannedIds: this.mostBannedIds,
+      mostBannedCount: this.mostBannedCount,
+      biggestCuckIds: this.biggestCuckIds,
+      biggestCuckCount: this.biggestCuckCount,
       log: this.log.slice(-30),
       lastEvent: this.lastEvent,
       allWordsUsed: [...this.allSpellingsEverUsed].sort(),

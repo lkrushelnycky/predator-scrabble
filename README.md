@@ -45,6 +45,11 @@ on the backend and a plain HTML/CSS/JS client (no build step).
 - When the bag empties, a 2-minute "meatwatching" countdown starts; steals,
   cuckolds, and defends are still allowed until it ends. The player with the
   most tiles in their nest wins.
+- The final scoreboard also hands out three joke awards (ties share the
+  award): **Retard Alert** (banned the most times), **Cuck Chair** (had
+  the most tiles stolen from them - cuckolds only count the victim's
+  original tiles, not the extra ones the thief added from the jungle), and
+  **Deeply Unserious** (ended with the fewest tiles).
 
 ## Interface
 

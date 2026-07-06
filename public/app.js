@@ -611,6 +611,12 @@
     }, 250);
   }
 
+  function renderAwardRow(label, ids, players, valueText) {
+    if (!ids || ids.length === 0) return '';
+    const names = ids.map((id) => escapeHtml(players.find((p) => p.id === id)?.name || '?')).join(' & ');
+    return `<div class="award"><span class="award-label">${label}</span><b>${names}</b><span class="award-value">${valueText}</span></div>`;
+  }
+
   function renderEnd(state) {
     const winners = state.players.filter((p) => state.winnerIds?.includes(p.id));
     const title = document.getElementById('end-title');
@@ -621,6 +627,28 @@
     results.innerHTML = sorted
       .map((p, i) => `<div>${i + 1}. <b>${escapeHtml(p.name)}</b> — ${p.tileCount} tiles (${p.words.map((w) => w.spelling).join(', ')})</div>`)
       .join('');
+
+    const awards = document.getElementById('end-awards');
+    awards.innerHTML = [
+      renderAwardRow(
+        'Retard Alert',
+        state.mostBannedIds,
+        state.players,
+        `${state.mostBannedCount} ban${state.mostBannedCount === 1 ? '' : 's'}`
+      ),
+      renderAwardRow(
+        'Cuck Chair',
+        state.biggestCuckIds,
+        state.players,
+        `${state.biggestCuckCount} tile${state.biggestCuckCount === 1 ? '' : 's'} stolen`
+      ),
+      renderAwardRow(
+        'Deeply Unserious',
+        state.leastTilesIds,
+        state.players,
+        `${state.leastTilesCount} tile${state.leastTilesCount === 1 ? '' : 's'}`
+      ),
+    ].join('');
   }
 
   let lastState = null;
